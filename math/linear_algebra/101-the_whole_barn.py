@@ -8,7 +8,7 @@ def add_matrices(mat1, mat2):
     """Adds two matrices element-wise.
     """
 
-    if type(mat1) != type(mat2):
+    if type(mat1) is not type(mat2):
         return None
     if not isinstance(mat1, list):
         return mat1 + mat2
