@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """
-A module that contains a function that concatenates two matrices along a specific axis.
+A module that contains a function that concatenates two matrices
+along a specific axis.
 """
 
-
 import numpy as np
+
 
 def np_cat(mat1, mat2, axis=0):
     """
