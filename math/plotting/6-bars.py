@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def frequency():
+def bars():
     """
     The function that plots a stacked bar graph.
     """
