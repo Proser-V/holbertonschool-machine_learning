@@ -10,7 +10,7 @@ def poly_derivative(poly):
     """
     if (not isinstance(poly, list)
             or len(poly) == 0
-            or not all( isinstance(num, (int, float)) for num in poly)):
+            or not all(isinstance(num, (int, float)) for num in poly)):
         return None
 
     if len(poly) == 1:
@@ -22,3 +22,5 @@ def poly_derivative(poly):
 
     if all(num == 0 for num in new_poly):
         return [0]
+
+    return new_poly
