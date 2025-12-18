@@ -95,6 +95,47 @@ class Node:
 
         return "\n".join(parts)
 
+    def get_leaves_below(self):
+        """
+        This function gets the leaves below the current node.
+        """
+        leaves = []
+
+        if self.left_child is not None:
+            leaves.extend(self.left_child.get_leaves_below())
+
+        if self.right_child is not None:
+            leaves.extend(self.right_child.get_leaves_below())
+
+        return leaves
+
+    def update_bounds_below(self):
+        """
+        This function update the bounds of the tree.
+        """
+        if self.is_root:
+            self.upper = {0: np.inf}
+            self.lower = {0: -1*np.inf}
+
+        for child in [self.left_child, self.right_child]:
+            if child is None:
+                continue
+
+            child.lower = self.lower.copy()
+            child.upper = self.upper.copy()
+
+            f = self.feature
+            t = self.threshold
+
+            if child is self.left_child:
+                child.lower[f] = max(child.lower.get(f, -np.inf), t)
+            else:
+                child.upper[f] = min(child.upper.get(f, np.inf), t)
+
+        for child in [self.left_child, self.right_child]:
+            if child is not None:
+                child.update_bounds_below()
+
 
 class Leaf(Node):
     """
@@ -123,6 +164,18 @@ class Leaf(Node):
         The method to represent the leaf object.
         """
         return (f"-> leaf [value={self.value}]")
+
+    def get_leaves_below(self):
+        """
+        This function check if there is a leaf below.
+        """
+        return [self]
+
+    def update_bounds_below(self):
+        """
+        This function does nothing as it is in a leaf.
+        """
+        pass
 
 
 class Decision_Tree():
@@ -160,3 +213,15 @@ class Decision_Tree():
         This method represent the object in string.
         """
         return self.root.__str__() + "\n"
+
+    def get_leaves(self):
+        """
+        This function get the leaves of a decision tree.
+        """
+        return self.root.get_leaves_below()
+
+    def update_bounds(self):
+        """
+        This function update the bounds of the tree.
+        """
+        self.root.update_bounds_below()
