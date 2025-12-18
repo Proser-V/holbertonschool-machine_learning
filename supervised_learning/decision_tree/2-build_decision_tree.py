@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
 """
-A module to define the depth of a tree.
+This module contains 3 classes linked to decision trees.
+This task aim at find the depth of a decision tree.
 """
 import numpy as np
 
 
 class Node:
     """
-    This class represent a node of a decision tree.
+    This class represent the node of a decision tree.
     """
-    def __init__(self, feature=None, threshold=None, left_child=None,
-                 right_child=None, is_root=False, depth=0):
+    def __init__(self, feature=None, threshold=None,
+                 left_child=None, right_child=None, is_root=False, depth=0):
         self.feature = feature
         self.threshold = threshold
         self.left_child = left_child
@@ -22,7 +23,7 @@ class Node:
 
     def max_depth_below(self):
         """
-        This methods define the max depth of the decision tree.
+        This function calculate the maximal depth of the tree by recursion.
         """
         if self.left_child is None and self.right_child is None:
             return self.depth
@@ -94,6 +95,20 @@ class Node:
 
         return "\n".join(parts)
 
+    def get_leaves_below(self):
+        """
+        This function gets the leaves below the current node.
+        """
+        leaves = []
+
+        if self.left_child is not None:
+            leaves.extend(self.left_child.get_leaves_below())
+
+        if self.right_child is not None:
+            leaves.extend(self.right_child.get_leaves_below())
+
+        return leaves
+
 
 class Leaf(Node):
     """
@@ -105,28 +120,37 @@ class Leaf(Node):
         self.is_leaf = True
         self.depth = depth
 
-    def count_nodes_below(self, only_leaves=False):
-        """
-        This function count the number of nodes below the leaf.
-        """
-        return 1
-
     def max_depth_below(self):
         """
         Return the length of the leaf.
         """
         return self.depth
 
+    def count_nodes_below(self, only_leaves=False):
+        """
+        This function count the number of nodes below the leaf.
+        """
+        return 1
+
     def __str__(self):
+        """
+        The method to represent the leaf object.
+        """
         return (f"-> leaf [value={self.value}]")
+
+    def get_leaves_below(self):
+        """
+        This function check if there is a leaf below.
+        """
+        return [self]
 
 
 class Decision_Tree():
     """
     This class represent the decision tree himself.
     """
-    def __init__(self, max_depth=10, min_pop=1, seed=0,
-                 split_criterion="random", root=None):
+    def __init__(self, max_depth=10, min_pop=1,
+                 seed=0, split_criterion="random", root=None):
         self.rng = np.random.default_rng(seed)
         if root:
             self.root = root
@@ -139,17 +163,26 @@ class Decision_Tree():
         self.split_criterion = split_criterion
         self.predict = None
 
-    def count_nodes(self, only_leaves=False):
-        """
-        This method counts the number of nodes.
-        """
-        return self.root.count_nodes_below(only_leaves=only_leaves)
-
     def depth(self):
         """
-        This method returns the depth.
+        Return the depth of the decision tree.
         """
         return self.root.max_depth_below()
 
+    def count_nodes(self, only_leaves=False):
+        """
+        The method to count nodes.
+        """
+        return self.root.count_nodes_below(only_leaves=only_leaves)
+
     def __str__(self):
-        return self.root.__str__()
+        """
+        This method represent the object in string.
+        """
+        return self.root.__str__() + "\n"
+
+    def get_leaves(self):
+        """
+        This function get the leaves of a decision tree.
+        """
+        return self.root.get_leaves_below()
