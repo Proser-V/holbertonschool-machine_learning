@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 
-Node = __import__('0-build_decision_tree').Node
-Leaf = __import__('0-build_decision_tree').Leaf
-Decision_Tree = __import__('0-build_decision_tree').Decision_Tree
+Node = __import__('1-build_decision_tree').Node
+Leaf = __import__('1-build_decision_tree').Leaf
+Decision_Tree = __import__('1-build_decision_tree').Decision_Tree
 
-def example_0() :
-    leaf0         = Leaf(0, depth=1)
-    leaf1         = Leaf(0, depth=2)
-    leaf2         = Leaf(1, depth=2)
-    internal_node = Node( feature=1, threshold=30000, left_child=leaf1, right_child=leaf2,          depth=1 )
-    root          = Node( feature=0, threshold=.5   , left_child=leaf0, right_child=internal_node , depth=0 , is_root=True)
+def example_0():
+    leaf0 = Leaf(0, depth=1)
+    leaf1 = Leaf(0, depth=2)
+    leaf2 = Leaf(1, depth=2)
+    internal_node = Node(feature=1, threshold=30000, left_child=leaf1, right_child=leaf2, depth=1)
+    root = Node(feature=0, threshold=.5, left_child=leaf0, right_child=internal_node, depth=0, is_root=True)
     return Decision_Tree(root=root)
 
 
@@ -32,5 +32,7 @@ def example_1(depth):
     root.is_root = True
     return Decision_Tree(root=root)
 
-print(example_0().depth())
-print(example_1(5).depth())
+print("Number of nodes  in example 0 :" , example_0().count_nodes())
+print("Number of leaves in example 0 :" , example_0().count_nodes(only_leaves=True))
+print("Number of nodes  in example 1 :" , example_1(4).count_nodes())
+print("Number of leaves in example 1 :" , example_1(4).count_nodes(only_leaves=True))
