@@ -52,25 +52,25 @@ class Node:
         else:
             return 1 + left_count + right_count
 
-    def left_child_add_prefix(self,text):
+    def left_child_add_prefix(self, text):
         """
         Function to add prefix to left child.
         """
-        lines=text.split("\n")
-        new_text="    +--"+lines[0]+"\n"
-        for x in lines[1:] :
-            new_text+=("    |  "+x)+"\n"
-        return (new_text)
+        lines = text.split("\n")
+        new_lines = ["    +--" + lines[0]]
+        for x in lines[1:]:
+            new_lines.append("    |  " + x)
+        return "\n".join(new_lines)
 
-    def right_child_add_prefix(self,text):
+    def right_child_add_prefix(self, text):
         """
         Function to add prefix to right child.
         """
-        lines=text.split("\n")
-        new_text="    +--"+lines[0]+"\n"
-        for x in lines[1:] :
-            new_text+=("    |  "+x)+"\n"
-        return (new_text)
+        lines = text.split("\n")
+        new_lines = ["    +--" + lines[0]]
+        for x in lines[1:]:
+            new_lines.append("       " + x)
+        return "\n".join(new_lines)
 
     def __str__(self):
         """
