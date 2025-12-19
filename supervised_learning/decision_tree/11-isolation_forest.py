@@ -296,7 +296,7 @@ class Random_Forest():
             arr=preds
         )
 
-    def fit(self, explanatory, target, n_trees=100, verbose=0):
+    def fit(self, explanatory, target, verbose=0):
         """
         The function that fit.
         """
@@ -307,7 +307,7 @@ class Random_Forest():
         nodes = []
         leaves = []
         accuracies = []
-        for i in range(n_trees):
+        for i in range(self.n_trees):
             T = Decision_Tree(max_depth=self.max_depth,
                               min_pop=self.min_pop, seed=self.seed+i)
             T.fit(explanatory, target)
@@ -622,10 +622,5 @@ class Isolation_Random_Forest():
         mean depth.
         """
         depths = self.predict(explanatory)
-        # trier les profondeurs et récupérer les indices triés
-        sorted_indices = np.argsort(depths)
-        top_indices = sorted_indices[:n_suspects]
-        # trier top_indices par profondeur croissante pour correspondre
-        # exactement au checker
-        top_indices = top_indices[np.argsort(depths[top_indices])]
-        return explanatory[top_indices], depths[top_indices]
+        indices = np.argsort(depths)[:n_suspects]
+        return explanatory[indices], depths[indices]
