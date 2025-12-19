@@ -83,16 +83,31 @@ class Decision_Tree():
 
     def random_split_criterion(self, node):
         """
-        Randomly choose a splitting rule for a given node.
+        Random splitting rule, safe against empty / constant sub-populations.
         """
-        diff = 0
-        while diff == 0:
+        idx = np.where(node.sub_population)[0]
+        m = idx.size
+
+        if m <= 1:
             feature = self.rng.integers(0, self.explanatory.shape[1])
-            feature_min, feature_max = self.np_extrema(
-                self.explanatory[:, feature][node.sub_population])
-            diff = feature_max-feature_min
+            threshold = self.explanatory[idx[0], feature] if m == 1 else 0.0
+            return feature, threshold
+
+        Xn = self.explanatory[idx]
+        mins = Xn.min(axis=0)
+        maxs = Xn.max(axis=0)
+        diffs = maxs - mins
+
+        valid = np.where(diffs > 0)[0]
+
+        if valid.size == 0:
+            feature = self.rng.integers(0, Xn.shape[1])
+            threshold = mins[feature]
+            return feature, threshold
+
+        feature = valid[self.rng.integers(0, valid.size)]
         x = self.rng.uniform()
-        threshold = (1 - x) * feature_min + x * feature_max
+        threshold = (1 - x) * mins[feature] + x * maxs[feature]
         return feature, threshold
 
     def fit(self, explanatory, target, verbose=0):
