@@ -147,20 +147,20 @@ class Decision_Tree():
 
     def fit_node(self, node):
         """
-        Recursively build the decision tree from a given node.
+        Function to fit nodes.
         """
-        node.feature, node.threshold = self.split_criterion(node)
+        node.feature, node.threshold = self.random_split_criterion(node)
 
         left_population = node.sub_population & (
-            self.explanatory[:, node.feature] > node.threshold)
+            self.explanatory[:, node.feature] > node.threshold
+        )
         right_population = node.sub_population & (
-            self.explanatory[:, node.feature] <= node.threshold)
+            self.explanatory[:, node.feature] <= node.threshold
+        )
 
-        # Is left node a leaf ?
         is_left_leaf = (
-            (np.sum(left_population) < self.min_pop) or
-            (node.depth + 1 == self.max_depth) or
-            (np.unique(self.target[left_population]).size == 1)
+            (np.sum(left_population) <= self.min_pop) or
+            (node.depth + 1 == self.max_depth)
         )
 
         if is_left_leaf:
@@ -169,11 +169,9 @@ class Decision_Tree():
             node.left_child = self.get_node_child(node, left_population)
             self.fit_node(node.left_child)
 
-        # Is right node a leaf ?
         is_right_leaf = (
-            (np.sum(right_population) < self.min_pop) or
-            (node.depth + 1 == self.max_depth) or
-            (np.unique(self.target[right_population]).size == 1)
+            (np.sum(right_population) <= self.min_pop) or
+            (node.depth + 1 == self.max_depth)
         )
 
         if is_right_leaf:
