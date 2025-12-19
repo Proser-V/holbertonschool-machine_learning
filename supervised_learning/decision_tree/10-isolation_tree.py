@@ -84,27 +84,34 @@ class Decision_Tree():
     def random_split_criterion(self, node):
         """
         Random splitting rule, safe against empty / constant sub-populations.
+
+        Returns a (feature, threshold) pair. If no split is possible (all features
+        constant or population too small), returns a harmless threshold to avoid
+        infinite loops.
         """
         idx = np.where(node.sub_population)[0]
         m = idx.size
 
+        # If node is empty or has only one sample: no meaningful split
         if m <= 1:
             feature = self.rng.integers(0, self.explanatory.shape[1])
             threshold = self.explanatory[idx[0], feature] if m == 1 else 0.0
             return feature, threshold
 
-        Xn = self.explanatory[idx]
+        Xn = self.explanatory[idx]          # (m, d)
         mins = Xn.min(axis=0)
         maxs = Xn.max(axis=0)
         diffs = maxs - mins
 
         valid = np.where(diffs > 0)[0]
 
+        # No feature can split (all constant)
         if valid.size == 0:
             feature = self.rng.integers(0, Xn.shape[1])
             threshold = mins[feature]
             return feature, threshold
 
+        # Choose a random splittable feature then a random threshold in its range
         feature = valid[self.rng.integers(0, valid.size)]
         x = self.rng.uniform()
         threshold = (1 - x) * mins[feature] + x * maxs[feature]
@@ -149,7 +156,7 @@ class Decision_Tree():
 
         # Is left node a leaf ?
         is_left_leaf = (
-            (np.sum(left_population) < self.min_pop) or
+            (np.sum(left_population) <= self.min_pop) or
             (node.depth + 1 == self.max_depth) or
             (np.unique(self.target[left_population]).size == 1)
         )
@@ -162,7 +169,7 @@ class Decision_Tree():
 
         # Is right node a leaf ?
         is_right_leaf = (
-            (np.sum(right_population) < self.min_pop) or
+            (np.sum(right_population) <= self.min_pop) or
             (node.depth + 1 == self.max_depth) or
             (np.unique(self.target[right_population]).size == 1)
         )
