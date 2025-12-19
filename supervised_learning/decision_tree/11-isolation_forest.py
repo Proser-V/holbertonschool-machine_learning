@@ -582,93 +582,45 @@ class Isolation_Random_Tree():
 
 
 class Isolation_Random_Forest():
-    """
-    Isolation Random Forest for unsupervised outlier detection.
-    Each tree is an Isolation_Random_Tree; outliers tend to fall in shallow
-    leaves.
-    """
     def __init__(self, n_trees=100, max_depth=10, min_pop=1, seed=0):
-        """
-        Initialize the Isolation Random Forest.
-
-        Parameters
-        ----------
-        n_trees : int
-            Number of trees in the forest.
-        max_depth : int
-            Maximum depth allowed for each tree.
-        min_pop : int
-            Minimum population in a node to allow splitting (currently unused
-            here).
-        seed : int
-            Random seed for reproducibility.
-        """
-        self.numpy_predicts = []
+        self.numpy_preds = []
         self.target = None
-        self.numpy_preds = None
+        self.explanatory = None
         self.n_trees = n_trees
         self.max_depth = max_depth
         self.seed = seed
-        self.explanatory = None
 
-    def fit(self, explanatory, n_trees=None, verbose=0):
-        """
-        Fit the forest to the explanatory data.
-
-        Parameters
-        ----------
-        explanatory : ndarray
-            Feature matrix of shape (n_samples, n_features).
-        n_trees : int, optional
-            Number of trees to fit (default is self.n_trees).
-        verbose : int, optional
-            If 1, prints summary statistics about the forest.
-        """
-        if n_trees is None:
-            n_trees = self.n_trees
+    def fit(self, explanatory, verbose=0):
         self.explanatory = explanatory
         self.numpy_preds = []
         depths = []
         nodes = []
         leaves = []
-
         for i in range(self.n_trees):
             T = Isolation_Random_Tree(
-                max_depth=self.max_depth, seed=self.seed+i
+                max_depth=self.max_depth, seed=self.seed + i
                 )
             T.fit(explanatory)
             self.numpy_preds.append(T.predict)
             depths.append(T.depth())
             nodes.append(T.count_nodes())
             leaves.append(T.count_nodes(only_leaves=True))
-
-        if verbose == 1:
+        if verbose:
             print(f"""  Training finished.
     - Mean depth                     : {np.array(depths).mean()}
     - Mean number of nodes           : {np.array(nodes).mean()}
     - Mean number of leaves          : {np.array(leaves).mean()}""")
 
     def predict(self, explanatory):
-        """
-        Compute the mean depth of each sample across all trees.
-
-        Parameters
-        ----------
-        explanatory : ndarray
-            Feature matrix of shape (n_samples, n_features).
-
-        Returns
-        -------
-        ndarray
-            Mean depths of all samples.
-        """
+        """Return mean depth predictions for each row."""
         predictions = np.array([f(explanatory) for f in self.numpy_preds])
         return predictions.mean(axis=0)
 
-
-def suspects(self, explanatory, n_suspects):
-    """Return the n_suspects rows in explanatory with smallest mean depth."""
-    depths = self.predict(explanatory)
-    # argsort renvoie les indices dans l'ordre croissant de profondeur
-    indices = np.argsort(depths)[:n_suspects]
-    return explanatory[indices], depths[indices]
+    def suspects(self, explanatory, n_suspects):
+        """
+        Return the n_suspects rows in explanatory with the smallest
+        mean depth.
+        """
+        depths = self.predict(explanatory)
+        indices = np.argsort(depths)[:n_suspects]
+        return explanatory[indices], depths[indices]
