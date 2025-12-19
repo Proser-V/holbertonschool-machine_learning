@@ -85,9 +85,9 @@ class Decision_Tree():
         """
         Random splitting rule, safe against empty / constant sub-populations.
 
-        Returns a (feature, threshold) pair. If no split is possible (all features
-        constant or population too small), returns a harmless threshold to avoid
-        infinite loops.
+        Returns a (feature, threshold) pair. If no split is possible
+        (all features constant or population too small), returns a
+        harmless threshold to avoid infinite loops.
         """
         feature = 0
         threshold = 0.0
@@ -113,7 +113,8 @@ class Decision_Tree():
             threshold = mins[feature]
             return feature, threshold
 
-        # Choose a random splittable feature then a random threshold in its range
+        # Choose a random splittable feature then a random threshold
+        # in its range
         feature = valid[self.rng.integers(0, valid.size)]
         x = self.rng.uniform()
         threshold = (1 - x) * mins[feature] + x * maxs[feature]
@@ -374,7 +375,10 @@ class Isolation_Random_Tree():
         return np.min(arr), np.max(arr)
 
     def random_split_criterion(self, node):
-        """Random splitting rule, safe against empty or constant sub-populations."""
+        """
+        Random splitting rule, safe against empty or constant
+        sub-populations.
+        """
         feature = 0
         threshold = 0.0
         idx = np.where(node.sub_population)[0]
@@ -417,18 +421,24 @@ class Isolation_Random_Tree():
     def fit_node(self, node):
         node.feature, node.threshold = self.random_split_criterion(node)
 
-        left_population = node.sub_population & (self.explanatory[:, node.feature] > node.threshold)
-        right_population = node.sub_population & (self.explanatory[:, node.feature] <= node.threshold)
+        left_population = node.sub_population & (
+            self.explanatory[:, node.feature] > node.threshold
+            )
+        right_population = node.sub_population & (
+            self.explanatory[:, node.feature] <= node.threshold
+            )
 
         # Leaf condition: population too small or max depth reached
-        is_left_leaf = (np.sum(left_population) <= self.min_pop) or (node.depth + 1 == self.max_depth)
+        is_left_leaf = ((np.sum(left_population) <= self.min_pop)
+                        or (node.depth + 1 == self.max_depth))
         if is_left_leaf:
             node.left_child = self.get_leaf_child(node, left_population)
         else:
             node.left_child = self.get_node_child(node, left_population)
             self.fit_node(node.left_child)
 
-        is_right_leaf = (np.sum(right_population) <= self.min_pop) or (node.depth + 1 == self.max_depth)
+        is_right_leaf = ((np.sum(right_population) <= self.min_pop)
+                         or (node.depth + 1 == self.max_depth))
         if is_right_leaf:
             node.right_child = self.get_leaf_child(node, right_population)
         else:
