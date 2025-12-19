@@ -574,15 +574,23 @@ class Isolation_Random_Forest():
         depths = []
         nodes = []
         leaves = []
+        n_samples = explanatory.shape[0]
+        
         for i in range(self.n_trees):
+            # Create a random subsample for each tree
+            rng = np.random.default_rng(self.seed + i)
+            sample_indices = rng.choice(n_samples, size=n_samples, replace=False)
+            subsample = explanatory[sample_indices]
+            
             T = Isolation_Random_Tree(
                 max_depth=self.max_depth, seed=self.seed + i
-                )
-            T.fit(explanatory)
+            )
+            T.fit(subsample)
             self.numpy_preds.append(T.predict)
             depths.append(T.depth())
             nodes.append(T.count_nodes())
             leaves.append(T.count_nodes(only_leaves=True))
+            
         if verbose:
             print(f"""  Training finished.
     - Mean depth                     : {np.array(depths).mean()}
