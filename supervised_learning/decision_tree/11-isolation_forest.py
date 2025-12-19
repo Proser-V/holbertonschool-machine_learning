@@ -616,17 +616,16 @@ class Isolation_Random_Forest():
         predictions = np.array([f(explanatory) for f in self.numpy_preds])
         return predictions.mean(axis=0)
 
-
-def suspects(self, explanatory, n_suspects):
-    """
-    Return the n_suspects rows in explanatory with the smallest
-    mean depth.
-    """
-    depths = self.predict(explanatory)
-    # trier les profondeurs et récupérer les indices triés
-    sorted_indices = np.argsort(depths)
-    top_indices = sorted_indices[:n_suspects]
-    # trier top_indices par profondeur croissante pour correspondre
-    # exactement au checker
-    top_indices = top_indices[np.argsort(depths[top_indices])]
-    return explanatory[top_indices], depths[top_indices]
+    def suspects(self, explanatory, n_suspects):
+        """
+        Return the n_suspects rows in explanatory with the smallest
+        mean depth.
+        """
+        depths = self.predict(explanatory)
+        # trier les profondeurs et récupérer les indices triés
+        sorted_indices = np.argsort(depths)
+        top_indices = sorted_indices[:n_suspects]
+        # trier top_indices par profondeur croissante pour correspondre
+        # exactement au checker
+        top_indices = top_indices[np.argsort(depths[top_indices])]
+        return explanatory[top_indices], depths[top_indices]
