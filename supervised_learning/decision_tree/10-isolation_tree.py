@@ -3,7 +3,9 @@
 This module contains 3 classes linked to decision trees.
 This task aim at find the depth of a decision tree.
 """
+
 import numpy as np
+
 Node = __import__('8-build_decision_tree').Node
 Leaf = __import__('8-build_decision_tree').Leaf
 
@@ -334,9 +336,23 @@ class Random_Forest():
 class Isolation_Random_Tree():
     """
     Isolation Random Tree for unsupervised outlier detection.
-    Each leaf value is its depth; outliers tend to fall in shallow leaves.
+    Each leaf's value corresponds to its depth; points falling into shallow
+    leaves are more likely to be outliers.
     """
     def __init__(self, max_depth=10, seed=0, root=None):
+        """
+        Initialize the Isolation Random Tree.
+
+        Parameters
+        ----------
+        max_depth : int
+            Maximum depth allowed for the tree.
+        seed : int
+            Random seed for reproducibility.
+        root : Node, optional
+            Existing root node (default is None, in which case a new
+            root is created).
+        """
         self.rng = np.random.default_rng(seed)
         self.root = root if root else Node(is_root=True)
         self.explanatory = None
@@ -344,24 +360,61 @@ class Isolation_Random_Tree():
         self.predict = None
         self.min_pop = 1
 
-    # Same methods as Decision_Tree
     def __str__(self):
+        """
+        Return a string representation of the tree structure.
+        """
         return self.root.__str__() + "\n"
 
     def depth(self):
+        """
+        Return the maximum depth of the tree.
+
+        Returns
+        -------
+        int
+            Depth of the tree.
+        """
         return self.root.max_depth_below()
 
     def count_nodes(self, only_leaves=False):
+        """
+        Count nodes in the tree.
+
+        Parameters
+        ----------
+        only_leaves : bool
+            If True, count only leaf nodes; otherwise count all nodes.
+
+        Returns
+        -------
+        int
+            Number of nodes in the tree.
+        """
         return self.root.count_nodes_below(only_leaves=only_leaves)
 
     def update_bounds(self):
+        """
+        Update the bounds of all nodes in the tree.
+        """
         self.root.update_bounds_below()
 
     def get_leaves(self):
+        """
+        Get all leaf nodes of the tree.
+
+        Returns
+        -------
+        list of Leaf
+            All leaves in the tree.
+        """
         return self.root.get_leaves_below()
 
     def update_predict(self):
-        """Prediction returns the depth of the leaf for each sample."""
+        """
+        Define the predict function to return the depth of the leaf
+        each sample falls into. Useful for outlier scoring.
+        """
         self.update_bounds()
         leaves = self.get_leaves()
         for leaf in leaves:
@@ -372,12 +425,35 @@ class Isolation_Random_Tree():
         )
 
     def np_extrema(self, arr):
+        """
+        Compute the minimum and maximum of a numpy array.
+
+        Parameters
+        ----------
+        arr : ndarray
+            Array to analyze.
+
+        Returns
+        -------
+        tuple
+            (min_value, max_value)
+        """
         return np.min(arr), np.max(arr)
 
     def random_split_criterion(self, node):
         """
-        Random splitting rule, safe against empty or constant
-        sub-populations.
+        Randomly select a feature and threshold to split a node.
+        Ensures split is valid even if node is small or constant.
+
+        Parameters
+        ----------
+        node : Node
+            Node to split.
+
+        Returns
+        -------
+        tuple
+            (feature_index, threshold_value)
         """
         feature = 0
         threshold = 0.0
@@ -405,30 +481,66 @@ class Isolation_Random_Tree():
         threshold = (1 - x) * mins[feature] + x * maxs[feature]
         return feature, threshold
 
-    # Leafs store depth as value
     def get_leaf_child(self, node, sub_population):
+        """
+        Create a leaf child node.
+
+        Parameters
+        ----------
+        node : Node
+            Parent node.
+        sub_population : ndarray of bool
+            Mask indicating samples belonging to this leaf.
+
+        Returns
+        -------
+        Leaf
+            Leaf node with value equal to depth.
+        """
         leaf_child = Leaf(value=node.depth + 1)
         leaf_child.depth = node.depth + 1
         leaf_child.sub_population = sub_population
         return leaf_child
 
     def get_node_child(self, node, sub_population):
+        """
+        Create an internal child node.
+
+        Parameters
+        ----------
+        node : Node
+            Parent node.
+        sub_population : ndarray of bool
+            Mask indicating samples belonging to this child.
+
+        Returns
+        -------
+        Node
+            New internal node.
+        """
         n = Node()
         n.depth = node.depth + 1
         n.sub_population = sub_population
         return n
 
     def fit_node(self, node):
+        """
+        Recursively fit a node and its children.
+
+        Parameters
+        ----------
+        node : Node
+            Node to fit.
+        """
         node.feature, node.threshold = self.random_split_criterion(node)
 
         left_population = node.sub_population & (
             self.explanatory[:, node.feature] > node.threshold
-            )
+        )
         right_population = node.sub_population & (
             self.explanatory[:, node.feature] <= node.threshold
-            )
+        )
 
-        # Leaf condition: population too small or max depth reached
         is_left_leaf = ((np.sum(left_population) <= self.min_pop)
                         or (node.depth + 1 == self.max_depth))
         if is_left_leaf:
@@ -446,6 +558,16 @@ class Isolation_Random_Tree():
             self.fit_node(node.right_child)
 
     def fit(self, explanatory, verbose=0):
+        """
+        Fit the Isolation Random Tree to the dataset.
+
+        Parameters
+        ----------
+        explanatory : ndarray
+            Feature matrix of shape (n_samples, n_features).
+        verbose : int, optional
+            If 1, prints summary of the tree.
+        """
         self.split_criterion = self.random_split_criterion
         self.explanatory = explanatory
         self.root.sub_population = np.ones(explanatory.shape[0], dtype=bool)
