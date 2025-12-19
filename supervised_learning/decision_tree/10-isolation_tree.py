@@ -89,6 +89,8 @@ class Decision_Tree():
         constant or population too small), returns a harmless threshold to avoid
         infinite loops.
         """
+        feature = 0
+        threshold = 0.0
         idx = np.where(node.sub_population)[0]
         m = idx.size
 
