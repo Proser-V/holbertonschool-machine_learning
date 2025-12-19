@@ -632,7 +632,7 @@ class Isolation_Random_Forest():
         nodes = []
         leaves = []
 
-        for i in range(n_trees):
+        for i in range(self.n_trees):
             T = Isolation_Random_Tree(
                 max_depth=self.max_depth, seed=self.seed+i
                 )
@@ -665,29 +665,10 @@ class Isolation_Random_Forest():
         predictions = np.array([f(explanatory) for f in self.numpy_preds])
         return predictions.mean(axis=0)
 
-    def suspects(self, explanatory, n_suspects):
-        """
-        Identify the samples most likely to be outliers based on their
-        mean depth.
 
-        Parameters
-        ----------
-        explanatory : ndarray
-            Feature matrix of shape (n_samples, n_features).
-        n_suspects : int
-            Number of top suspects to return.
-
-        Returns
-        -------
-        tuple
-            suspects : ndarray of shape (n_suspects, n_features)
-                The feature vectors of the suspected outliers.
-            depths : ndarray of shape (n_suspects,)
-                The mean depth values corresponding to each suspect.
-        """
-        # Compute mean depths of all samples
-        depths = self.predict(explanatory)
-        # Get indices of the n_suspects smallest mean depths
-        idx_suspects = np.argsort(depths)[:n_suspects]
-        # Return the samples and their depths
-        return explanatory[idx_suspects], depths[idx_suspects]
+def suspects(self, explanatory, n_suspects):
+    """Return the n_suspects rows in explanatory with smallest mean depth."""
+    depths = self.predict(explanatory)
+    # argsort renvoie les indices dans l'ordre croissant de profondeur
+    indices = np.argsort(depths)[:n_suspects]
+    return explanatory[indices], depths[indices]
