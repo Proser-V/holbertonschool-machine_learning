@@ -393,6 +393,8 @@ class Isolation_Random_Tree():
         """
         Random splitting rule, safe against empty / constant sub-populations.
         """
+        feature = 0
+        threshold = 0.0
         idx = np.where(node.sub_population)[0]
         m = idx.size
 
