@@ -27,21 +27,21 @@ class Neuron:
         self.__A = 0
 
     @property
-    def weight(self):
+    def W(self):
         """
         The weights vector for the neuron.
         """
         return self.__W
 
     @property
-    def bias(self):
+    def b(self):
         """
         The bias for the neuron.
         """
         return self.__b
 
     @property
-    def activated_output(self):
+    def A(self):
         """
         The activated output of the neuron (prediction).
         """
