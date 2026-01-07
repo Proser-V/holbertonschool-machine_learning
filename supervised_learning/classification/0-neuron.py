@@ -15,7 +15,7 @@ class Neuron:
         self: current instance
         nx: nx is the number of input features to the neuron
         """
-        if nx is not isinstance(nx, int):
+        if not isinstance(nx, int):
             raise TypeError("nx must be an integer")
         if nx < 1:
             raise ValueError("nx must be a positive integer")
