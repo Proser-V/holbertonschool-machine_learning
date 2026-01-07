@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-
+"""
+A module with a class that defines a single neuron performing binary
+classification.
+"""
 import numpy as np
 
 
