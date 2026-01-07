@@ -108,9 +108,10 @@ class Neuron:
         Trains the neuron.
 
         X: a numpy.ndarray with shape (nx, m) that contains the input data.
-        Y: a numpy.ndarray with shape (1, m) that contains the correct labels for the input data
-        iterations: the number of iterations to train over
-        alpha: the learning rate
+        Y: a numpy.ndarray with shape (1, m) that contains the correct
+        labels for the input data.
+        iterations: the number of iterations to train over.
+        alpha: the learning rate.
         """
         if not isinstance(iterations, int):
             raise TypeError("iterations must be an integer")
