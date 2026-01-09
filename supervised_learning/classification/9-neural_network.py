@@ -54,7 +54,7 @@ class NeuralNetwork:
         The activated output for the hidden layer.
         """
         return self.__A1
-    
+
     @property
     def W2(self):
         """
