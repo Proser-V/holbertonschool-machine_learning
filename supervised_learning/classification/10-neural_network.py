@@ -83,7 +83,7 @@ class NeuralNetwork:
         X: That contains the input data.
         """
         Z1 = np.matmul(self.__W1, X) + self.__b1
-        Z2 = np.matmul(self.__W2, X) + self.__b2
+        Z2 = np.matmul(self.__W2, self.A1) + self.__b2
         self.__A1 = 1 / (1 + np.exp(-Z1))
         self.__A2 = 1 / (1 + np.exp(-Z2))
         return self.__A1, self.__A2
